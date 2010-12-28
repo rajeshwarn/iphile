@@ -1,4 +1,5 @@
 #summary About iPhile
+#labels Featured
 
 = Important information =
 
@@ -26,6 +27,8 @@ Now you know something about this project's backgrounds.
 Let's talk about how you use it.
 
 =Usage=
+
+Oh, of course you need to install [http://dokan-dev.net Dokan] version 0.5.3 or higher first to use iPhile.
 
 You just run iPhile.exe and it should work. In its current releases it logs events and errors into the file log.txt.
 When you run iPhile.exe, you see some kind of disclaimer. If you press any key, iPhile starts listening to iDevice's connect/disconnect events.
