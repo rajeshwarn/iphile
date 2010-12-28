@@ -1,0 +1,3 @@
+﻿iPhile - CHANGELOG
+
+1.5 - Intitial public release.
