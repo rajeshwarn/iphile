@@ -1,3 +1,5 @@
+2010-12-29  ebbes <ebbes.ebbes@gmail.com>
+  * Modified to fit iPhile's needs.
 2010-11-21	Lokkju <lokkju@lokkju.com>
 	* Updated to work with iTunes 10
 2007-08-29	Lokkju <lokkju@lokkju.com>
