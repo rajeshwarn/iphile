@@ -234,41 +234,41 @@ namespace iPhile
             foreach (string Directory in iDevice.GetDirectories(Filename))
             {
                 Dictionary<string, string> PhoneFileInfo = iDevice.GetFileInfo(Filename + (Filename.EndsWith("/") ? "" : "/") + Directory);
-                //seconds since 01.01.1970 00:00:00
-                long unix_timestamp = 0;
-                //Add unix_timestamp to LastAccessTime later.
-                DateTime LastAccessTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-
-                if (PhoneFileInfo.ContainsKey("st_mtime"))
-                    unix_timestamp = long.Parse(PhoneFileInfo["st_mtime"].Substring(0, 10));
-
-                //Add seconds since 1970 to 1970 so we get our Windows date :-)
-                LastAccessTime = LastAccessTime.AddSeconds(unix_timestamp);
 
                 FileInformation finfo = new FileInformation();
                 finfo.FileName = Directory;
                 finfo.Attributes = System.IO.FileAttributes.Directory;
                 if (Directory.StartsWith("."))
                     finfo.Attributes |= System.IO.FileAttributes.Hidden;
-                finfo.LastAccessTime = LastAccessTime;
-                finfo.LastWriteTime = LastAccessTime;
-                finfo.CreationTime = LastAccessTime;
+
+                //LastAccessTime setting.
+                //sometimes causes problems when no information is available, causing ugly errors on
+                //iPhile's console.
+                if (PhoneFileInfo.ContainsKey("st_mtime"))
+                {
+                    //seconds since 01.01.1970 00:00:00
+                    long unix_timestamp = long.Parse(PhoneFileInfo["st_mtime"].Substring(0, 10));
+                    //Add unix_timestamp to LastAccessTime later.
+                    DateTime LastAccessTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                    //Add seconds since 1970 to 1970 so we get our Windows date :-)
+                    LastAccessTime = LastAccessTime.AddSeconds(unix_timestamp);
+
+                    finfo.LastAccessTime = LastAccessTime;
+                    finfo.LastWriteTime = LastAccessTime;
+                    finfo.CreationTime = LastAccessTime;
+                }
+                else
+                {
+                    finfo.LastAccessTime = DateTime.Now;
+                    finfo.LastWriteTime = DateTime.Now;
+                    finfo.CreationTime = DateTime.Now;
+                }
                 files.Add(finfo);
             }
             //... then files.
             foreach (string File in iDevice.GetFiles(Filename))
             {
                 Dictionary<string, string> PhoneFileInfo = iDevice.GetFileInfo(Filename + (Filename.EndsWith("/") ? "" : "/") + File);
-                //seconds since 01.01.1970 00:00:00
-                long unix_timestamp = 0;
-                //Add unix_timestamp to LastAccessTime later.
-                DateTime LastAccessTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-
-                if (PhoneFileInfo.ContainsKey("st_mtime"))
-                    unix_timestamp = long.Parse(PhoneFileInfo["st_mtime"].Substring(0, 10));
-
-                //Add seconds since 1970 to 1970 so we get our Windows date :-)
-                LastAccessTime = LastAccessTime.AddSeconds(unix_timestamp);
 
                 FileInformation finfo = new FileInformation();
                 finfo.FileName = File;
@@ -276,9 +276,29 @@ namespace iPhile
                 if (File.StartsWith("."))
                     finfo.Attributes |= System.IO.FileAttributes.Hidden;
 
-                finfo.LastAccessTime = LastAccessTime;
-                finfo.LastWriteTime = LastAccessTime;
-                finfo.CreationTime = LastAccessTime;
+                //LastAccessTime setting.
+                //sometimes causes problems when no information is available, causing ugly errors on
+                //iPhile's console.
+                if (PhoneFileInfo.ContainsKey("st_mtime"))
+                {
+                    //seconds since 01.01.1970 00:00:00
+                    long unix_timestamp = long.Parse(PhoneFileInfo["st_mtime"].Substring(0, 10));
+                    //Add unix_timestamp to LastAccessTime later.
+                    DateTime LastAccessTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                    //Add seconds since 1970 to 1970 so we get our Windows date :-)
+                    LastAccessTime = LastAccessTime.AddSeconds(unix_timestamp);
+
+                    finfo.LastAccessTime = LastAccessTime;
+                    finfo.LastWriteTime = LastAccessTime;
+                    finfo.CreationTime = LastAccessTime;
+                }
+                else
+                {
+                    finfo.LastAccessTime = DateTime.Now;
+                    finfo.LastWriteTime = DateTime.Now;
+                    finfo.CreationTime = DateTime.Now;
+                }
+
                 finfo.Length = (long)iDevice.FileSize(Filename + (Filename.EndsWith("/") ? "" : "/") + File);
                 files.Add(finfo);
             }
@@ -304,16 +324,6 @@ namespace iPhile
                     return -DokanNet.ERROR_FILE_NOT_FOUND;
 
                 Dictionary<string, string> PhoneFileInfo = iDevice.GetFileInfo(Filename);
-                //seconds since 01.01.1970 00:00:00
-                long unix_timestamp = 0;
-                //Add unix_timestamp to LastAccessTime later.
-                DateTime LastAccessTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-
-                if (PhoneFileInfo.ContainsKey("st_mtime"))
-                    unix_timestamp = long.Parse(PhoneFileInfo["st_mtime"].Substring(0, 10));
-
-                //Add seconds since 1970 to 1970 so we get our Windows date :-)
-                LastAccessTime = LastAccessTime.AddSeconds(unix_timestamp);
 
                 string FileName = (Filename == "/" ? "/" : Filename.Split('/')[Filename.Split('/').Length - 1]);
 
@@ -322,9 +332,30 @@ namespace iPhile
                 if (FileName.StartsWith("."))
                     fileinfo.Attributes |= System.IO.FileAttributes.Hidden;
                 fileinfo.FileName = FileName;
-                fileinfo.LastAccessTime = LastAccessTime;
-                fileinfo.LastWriteTime = LastAccessTime;
-                fileinfo.CreationTime = LastAccessTime;
+
+                //LastAccessTime setting.
+                //sometimes causes problems when no information is available, causing ugly errors on
+                //iPhile's console.
+                if (PhoneFileInfo.ContainsKey("st_mtime"))
+                {
+                    //seconds since 01.01.1970 00:00:00
+                    long unix_timestamp = long.Parse(PhoneFileInfo["st_mtime"].Substring(0, 10));
+                    //Add unix_timestamp to LastAccessTime later.
+                    DateTime LastAccessTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                    //Add seconds since 1970 to 1970 so we get our Windows date :-)
+                    LastAccessTime = LastAccessTime.AddSeconds(unix_timestamp);
+
+                    fileinfo.LastAccessTime = LastAccessTime;
+                    fileinfo.LastWriteTime = LastAccessTime;
+                    fileinfo.CreationTime = LastAccessTime;
+                }
+                else
+                {
+                    fileinfo.LastAccessTime = DateTime.Now;
+                    fileinfo.LastWriteTime = DateTime.Now;
+                    fileinfo.CreationTime = DateTime.Now;
+                }
+
                 fileinfo.Length = (long)iDevice.FileSize(Filename);
 
                 return DokanNet.DOKAN_SUCCESS;
