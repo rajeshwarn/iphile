@@ -39,30 +39,57 @@ namespace iPhile
 
         static void Main(string[] args)
         {
-            Console.Clear();
-            Console.WriteLine("iPhile Copyright (C) 2010");
-            Console.WriteLine("This program comes with ABSOLUTELY NO WARRANTY.");
-            Console.WriteLine("This is free software, and you are welcome to redistribute it");
-            Console.WriteLine("under certain conditions; see \"COPYING.txt\".");
-            Console.WriteLine();
-            Console.WriteLine("iPhile v" + AppVersion.ToString());
-            Console.WriteLine("Mount iPhone filesystem into Windows Explorer");
-            #if DEBUGLOGGER
-            Console.WriteLine(":: INFO :: Debug logging enabled! Loglevel: " + (Debugger.LLevel == Debugger.LogLevel.Error ? "Errors" : (Debugger.LLevel == Debugger.LogLevel.Event ? "Errors + Events" : "All")));
-            #endif
-
-            Console.WriteLine("\r\n\r\n\r\nPlease see Readme.txt for information about this application.");
-
-            Console.WriteLine("\r\n\r\nPlease install Dokan >= 0.5.3 if not already done\r\nor this application will not work.\r\n\r\n");
-
-            Console.WriteLine("BEWARE! This application has development quality!");
-            Console.WriteLine("It's all your fault if it bricks your iPhone, iPod touch, iPad or your PC!");
-            Console.WriteLine("I give no warranty for your device. Only continue if you really know what you");
-            Console.WriteLine("are doing. You have been warned.\r\n");
-
-            Console.Write("Please press any key to start iPhile!");
-            Console.ReadKey();
-
+            bool SkipInfo = false;
+            foreach (string arg in args)
+            {
+                if (arg.ToLower() == "-skipinfo")
+                {
+                    SkipInfo = true;
+                }
+                #if DEBUGLOGGER
+                if (arg.ToLower().StartsWith("-loglevel") && arg.Length == 10)
+                {
+                    if (arg.Substring(9) == "0")
+                        Debugger.LLevel = Debugger.LogLevel.Error;
+                    if (arg.Substring(9) == "1")
+                        Debugger.LLevel = Debugger.LogLevel.Event;
+                    if (arg.Substring(9) == "2")
+                        Debugger.LLevel = Debugger.LogLevel.Information;
+                }
+                #endif
+            }
+            if (!SkipInfo)
+            {
+                Console.Clear();
+                Console.WriteLine("iPhile Copyright (C) 2010");
+                Console.WriteLine("This program comes with ABSOLUTELY NO WARRANTY.");
+                Console.WriteLine("This is free software, and you are welcome to redistribute it");
+                Console.WriteLine("under certain conditions; see \"COPYING.txt\".");
+                Console.WriteLine();
+                Console.WriteLine("iPhile v" + AppVersion.ToString());
+                Console.WriteLine("Mount iPhone filesystem into Windows Explorer");
+                #if DEBUGLOGGER
+                Console.WriteLine(":: INFO :: Debug logging enabled! Loglevel: " + (Debugger.LLevel == Debugger.LogLevel.Error ? "Errors" : (Debugger.LLevel == Debugger.LogLevel.Event ? "Errors + Events" : "All")));
+                Console.WriteLine("You can switch the LogLevel by calling iPhile with arguments");
+                Console.WriteLine("-loglevel0 -loglevel1 -loglevel2");
+                #endif
+                Console.WriteLine();
+                Console.WriteLine("Please see Readme.txt for information about this application.");
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("Please install Dokan if not already done or this application won't work.");
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("BEWARE! This application has development quality!");
+                Console.WriteLine("It's all your fault if it bricks your iPhone, iPod touch, iPad or your PC!");
+                Console.WriteLine("I give no warranty for your device. Only continue if you really know what you");
+                Console.WriteLine("are doing. You have been warned.");
+                Console.WriteLine();
+                Console.WriteLine("Note: You can skip this message by calling iPhile with parameter -skipinfo");
+                Console.WriteLine();
+                Console.Write("Please press any key to start iPhile!");
+                Console.ReadKey();
+            }
             Console.Clear();
 
             #if DEBUGLOGGER && LOGTOFILE
