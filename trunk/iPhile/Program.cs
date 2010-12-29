@@ -46,7 +46,6 @@ namespace iPhile
                 {
                     SkipInfo = true;
                 }
-                #if DEBUGLOGGER
                 if (arg.ToLower().StartsWith("-loglevel") && arg.Length == 10)
                 {
                     if (arg.Substring(9) == "0")
@@ -56,7 +55,10 @@ namespace iPhile
                     if (arg.Substring(9) == "2")
                         Debugger.LLevel = Debugger.LogLevel.Information;
                 }
-                #endif
+                if (arg.ToLower() == "-consolelog")
+                {
+                    Debugger.LogToFile = false;
+                }
             }
             if (!SkipInfo)
             {
@@ -68,11 +70,10 @@ namespace iPhile
                 Console.WriteLine();
                 Console.WriteLine("iPhile v" + AppVersion.ToString());
                 Console.WriteLine("Mount iPhone filesystem into Windows Explorer");
-                #if DEBUGLOGGER
-                Console.WriteLine(":: INFO :: Debug logging enabled! Loglevel: " + (Debugger.LLevel == Debugger.LogLevel.Error ? "Errors" : (Debugger.LLevel == Debugger.LogLevel.Event ? "Errors + Events" : "All")));
+                Console.WriteLine();
+                Console.WriteLine("Debug logging enabled. Loglevel: " + (Debugger.LLevel == Debugger.LogLevel.Error ? "Errors" : (Debugger.LLevel == Debugger.LogLevel.Event ? "Errors + Events" : "All")));
                 Console.WriteLine("You can switch the LogLevel by calling iPhile with arguments");
                 Console.WriteLine("-loglevel0 -loglevel1 -loglevel2");
-                #endif
                 Console.WriteLine();
                 Console.WriteLine("Please see Readme.txt for information about this application.");
                 Console.WriteLine();
@@ -92,9 +93,7 @@ namespace iPhile
             }
             Console.Clear();
 
-            #if DEBUGLOGGER && LOGTOFILE
             Debugger.Log_Clear();
-            #endif
 
             Console.WriteLine("iPhile started\r\n");
             Console.WriteLine("Waiting for iPhones to connect...\r\n");
@@ -110,9 +109,7 @@ namespace iPhile
                 Disconnect_FS(iDevice);
             }
 
-            #if DEBUGLOGGER && LOGTOFILE
             Debugger.Close();
-            #endif
         }
 
         /// <summary>
@@ -186,17 +183,13 @@ namespace iPhile
             if (Device.DriveLetter == '0')
             {
                 Console.WriteLine("No drive letter available. iPhile stop.");
-                #if DEBUGLOGGER
                 Debugger.Log("ERROR: No drive letter available.", 0);
-                #endif
                 return;
             }
 
             Console.WriteLine("Connecting filesystem under " + Device.DriveLetter.ToString().ToUpper() + ":\\>...\r\n");
 
-            #if DEBUGLOGGER
             Debugger.Log(string.Format("EVENT: {0} connected. Mapping under {1}:\\>", Device.DeviceName, Device.DriveLetter.ToString().ToUpper()), Debugger.LogLevel.Event);
-            #endif
 
             DokanOptions opt = new DokanOptions();
             opt.DriveLetter = Device.DriveLetter;
@@ -218,9 +211,7 @@ namespace iPhile
         static void Disconnect_FS(iPhone iDevice)
         {
             Console.WriteLine("Disconnecting filesystem under " + iDevice.DriveLetter.ToString().ToUpper() + ":\\>...\r\n");
-            #if DEBUGLOGGER
             Debugger.Log(string.Format("EVENT: Disconnecting device under {0}:\\>", iDevice.DriveLetter.ToString().ToUpper()), Debugger.LogLevel.Event);
-            #endif
             DokanNet.DokanUnmount(iDevice.DriveLetter);
         }
     }

@@ -33,9 +33,7 @@ namespace iPhile
         //For jailbreak devices only: Get size of media partition
         private iPhone_ForceAFC iDeviceMedia;
 
-        #if DEBUGLOGGER
         private string LetterString;
-        #endif
 
         //We won't windows allow to create certain files on our UNIX system.
         //Those file names are case insensitive, even if windows tried to create AuToRuN.iNf it would fail.
@@ -49,17 +47,13 @@ namespace iPhile
         {
             iDevice = iphone;
 
-            #if DEBUGLOGGER
             LetterString = iDevice.DriveLetter.ToString().ToUpper() + ":> ";
             Debugger.Log(LetterString + "EVENT: FileSystem initialized.", Debugger.LogLevel.Event);
-            #endif
 
             if (iDevice.IsJailbreak)
             {
                 iDeviceMedia = new iPhone_ForceAFC(iDevice);
-                #if DEBUGLOGGER
                 Debugger.Log(LetterString + "EVENT: iDevice jailbroken. Connecting to afc service.", Debugger.LogLevel.Event);
-                #endif
             }
         }
 
@@ -76,9 +70,7 @@ namespace iPhile
         /// </summary>
         public int CloseFile(string filename, DokanFileInfo info)
         {
-            #if DEBUGLOGGER
             Debugger.Log(LetterString + "FS: CloseFile: " + filename, Debugger.LogLevel.Information);
-            #endif
             if (info.Context != null)
             {
                 info.Context.Close();
@@ -95,9 +87,7 @@ namespace iPhile
             //If directory already exists throw error "already existing".
             if (iDevice.Exists(filename.Replace('\\', '/')))
                 return -DokanNet.ERROR_ALREADY_EXISTS;
-            #if DEBUGLOGGER
             Debugger.Log(LetterString + "FS: CreateDirectory: " + filename, Debugger.LogLevel.Information);
-            #endif
             return (iDevice.CreateDirectory(filename.Replace('\\', '/')) ? DokanNet.DOKAN_SUCCESS : -DokanNet.DOKAN_ERROR);
         }
 
@@ -117,9 +107,7 @@ namespace iPhile
             foreach (string FilterString in FileCreationFilters)
                 if (filename.ToLower().EndsWith(FilterString))
                     return -DokanNet.ERROR_ACCESS_DENIED;
-            #if DEBUGLOGGER
             Debugger.Log(LetterString + "FS: CreateFile: " + filename + " Mode: " + mode.ToString(), Debugger.LogLevel.Information);
-            #endif
 
             try //and pray it works...
             {
@@ -161,9 +149,7 @@ namespace iPhile
             }
             catch (Exception ex)
             {
-                #if DEBUGLOGGER
                 Debugger.Log(LetterString + "ERROR: FS: CreateFile: " + ex.Message + " Filename: " + filename, Debugger.LogLevel.Error);
-                #endif
                 return -DokanNet.DOKAN_ERROR;
             }
             return DokanNet.DOKAN_SUCCESS;
@@ -174,9 +160,7 @@ namespace iPhile
         /// </summary>
         public int DeleteDirectory(string filename, DokanFileInfo info)
         {
-            #if DEBUGLOGGER
             Debugger.Log(LetterString + "FS: DeleteDirectory: " + filename, Debugger.LogLevel.Information);
-            #endif
             iDevice.DeleteDirectory(filename.Replace('\\', '/'));
             return DokanNet.DOKAN_SUCCESS;
         }
@@ -186,9 +170,7 @@ namespace iPhile
         /// </summary>
         public int DeleteFile(string filename, DokanFileInfo info)
         {
-            #if DEBUGLOGGER
             Debugger.Log(LetterString + "FS: DeleteFile: " + filename, Debugger.LogLevel.Information);
-            #endif
             iDevice.DeleteFile(filename.Replace('\\', '/'));
             return DokanNet.DOKAN_SUCCESS;
         }
@@ -206,9 +188,7 @@ namespace iPhile
         {
             if (info.Context != null)
             {
-                #if DEBUGLOGGER
                 Debugger.Log(LetterString + "FS: FlushFileBuffers: " + filename, Debugger.LogLevel.Information);
-                #endif
                 info.Context.Flush();
             }
             return DokanNet.DOKAN_SUCCESS;
@@ -222,9 +202,7 @@ namespace iPhile
             System.Collections.ArrayList files,
             DokanFileInfo info)
         {
-            #if DEBUGLOGGER
             Debugger.Log(LetterString + "FS: FindFiles: " + filename, Debugger.LogLevel.Information);
-            #endif
             string Filename = filename.Replace('\\', '/');
 
             if (!iDevice.Exists(Filename))
@@ -315,9 +293,7 @@ namespace iPhile
         {
             try
             {
-                #if DEBUGLOGGER
                 Debugger.Log(LetterString + "FS: GetFileInformation: " + filename, Debugger.LogLevel.Information);
-                #endif
                 string Filename = filename.Replace('\\', '/');
 
                 if (!iDevice.Exists(Filename))
@@ -362,9 +338,7 @@ namespace iPhile
             }
             catch (Exception ex)
             {
-                #if DEBUGLOGGER
                 Debugger.Log(LetterString + "ERROR: FS: GetFileInformation: " + ex.Message + " Filename: " + filename, Debugger.LogLevel.Error);
-                #endif
                 return -DokanNet.DOKAN_ERROR;
             }
         }
@@ -390,9 +364,7 @@ namespace iPhile
             bool replace,
             DokanFileInfo info)
         {
-            #if DEBUGLOGGER
             Debugger.Log(LetterString + "FS: MoveFile: " + filename + " -> " + newname, Debugger.LogLevel.Information);
-            #endif
             try
             {
                 //Manzana.dll 'rename' is actually a move command
@@ -400,9 +372,9 @@ namespace iPhile
             }
             catch (Exception ex)
             {
-                #if DEBUGLOGGER
+                
                 Debugger.Log(LetterString + "ERROR: FS: MoveFile: " + ex.Message + " " + filename + " -> " + newname, Debugger.LogLevel.Error);
-                #endif
+                
                 return -DokanNet.DOKAN_ERROR;
             }
             return DokanNet.DOKAN_SUCCESS;
@@ -414,9 +386,7 @@ namespace iPhile
         /// </summary>
         public int OpenDirectory(string filename, DokanFileInfo info)
         {
-            #if DEBUGLOGGER
             Debugger.Log(LetterString + "FS: OpenDirectory: " + filename, Debugger.LogLevel.Information);
-            #endif
             info.IsDirectory = (iDevice.IsDirectory(filename.Replace('\\', '/')) || filename.Replace('\\', '/') == "/");
             return DokanNet.DOKAN_SUCCESS;
         }
@@ -432,9 +402,7 @@ namespace iPhile
             long offset,
             DokanFileInfo info)
         {
-            #if DEBUGLOGGER
             Debugger.Log(LetterString + "INFO: FS: ReadFile: " + filename + " Offset " + offset.ToString() + " ReadBytes " + buffer.Length.ToString(), Debugger.LogLevel.Information);
-            #endif
 
             //Stop if file does not exist
             if (!iDevice.Exists(filename.Replace('\\', '/')))
@@ -453,9 +421,7 @@ namespace iPhile
             }
             catch (Exception ex)
             {
-#if DEBUGLOGGER
                 Debugger.Log(LetterString + "ERROR: FS: ReadFile: " + ex.Message + " Filename: " + filename, Debugger.LogLevel.Error);
-#endif
                 return -DokanNet.DOKAN_ERROR;
             }
             return DokanNet.DOKAN_SUCCESS;
@@ -569,18 +535,16 @@ namespace iPhile
         {
             try
             {
-                if (info.Context == null)
+                if (info.Context == null) //should not happen. But who knows.
                     info.Context = iPhoneFile.OpenWrite(iDevice, filename.Replace('\\', '/'));
-                long InitialOffset = offset;
-                info.Context.Position = offset;
+                long InitialOffset = offset; //Set initial offset
+                info.Context.Position = offset; //Set offset, this is working now :-)
                 info.Context.Write(buffer, 0, buffer.Length);
-                writtenBytes = (uint)(info.Context.Position - InitialOffset);
+                writtenBytes = (uint)(info.Context.Position - InitialOffset); //tell Dokan how many bytes were written.
             }
             catch (Exception ex)
             {
-                #if DEBUGLOGGER
                 Debugger.Log(LetterString + "ERROR: FS: WriteFile: " + ex.Message + " Filename: " + filename, Debugger.LogLevel.Error);
-                #endif
                 return -DokanNet.DOKAN_ERROR;
             }
             return DokanNet.DOKAN_SUCCESS;

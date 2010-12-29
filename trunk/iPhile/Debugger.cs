@@ -18,7 +18,6 @@
  * along with iPhile.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if DEBUGLOGGER
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -41,42 +40,42 @@ namespace iPhile
             Information
         }
 
-        #if LOGTOFILE
-        static StreamWriter Writer = new StreamWriter("log.txt", true);
+        public static bool LogToFile = true;
+
+        static StreamWriter Writer = null;
 
         public static void Log_Clear()
         {
-            Writer.Close();
-            File.Delete("log.txt");
-            Writer = new StreamWriter("log.txt", true);
+            if (LogToFile)
+            {
+                if (Writer != null)
+                    Writer.Close();
+                File.Delete("log.txt");
+                Writer = new StreamWriter("log.txt", true);
+            }
         }
-        #endif
 
         public static void Log(string LogString)
         {
-        #if !LOGTOFILE
-            System.Diagnostics.Debug.WriteLine(LogString);
-        #else
-            Writer.WriteLine(LogString);
-        #endif
+            if (LogToFile)
+                Writer.WriteLine(LogString);
+            else
+                System.Diagnostics.Debug.WriteLine(LogString);
         }
 
         public static void Log(string LogString, LogLevel logLevel)
         {
             if ((int)LLevel >= (int)logLevel)
-                #if !LOGTOFILE
-                    System.Diagnostics.Debug.WriteLine(LogString);
-                #else
+                if (LogToFile)
                     Writer.WriteLine(LogString);
-                #endif
+                else
+                    System.Diagnostics.Debug.WriteLine(LogString);
         }
 
-        #if LOGTOFILE
         public static void Close()
         {
-            Writer.Close();
+            if (LogToFile)
+                Writer.Close();
         }
-        #endif
     }
 }
-#endif
