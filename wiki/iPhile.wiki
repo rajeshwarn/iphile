@@ -11,7 +11,7 @@ iPhile is a simple utility designed to mount the filesystem of devices running A
 
 I started this project because I was really bored. I was inspired by some projects that offered similar features, both closed and open source ones.
 But nothing of these projects fit my needs or worked properly.
-So I started iPhile using C#. I found Dokan and its .NET binding to implement a filesystem for Windows. I also wanted to use Manzana.dll, but it did not work properly on Windows 7 with iTunes 10 installed. Trying not to reinvent the wheel in that case, I googled and found iPhoneFS here on Googlecode. It also had the same aim as my tool but did not fit my needs, either. (And it didn't work on my computer, I don't know why.)
+So I started iPhile using C#. I found Dokan and its .NET binding to implement a filesystem for Windows. I also wanted to use [http://code.google.com/p/manzana Manzana.dll], but it did not work properly on Windows 7 with iTunes 10 installed. Trying not to reinvent the wheel in that case, I googled and found [http://code.google.com/p/iphonefs/ iPhoneFS] here on Googlecode. It also had the same aim as my tool but did not fit my needs, either. (And it didn't work on my computer, I don't know why.)
 But iPhoneFS relied on a GPL'ed version of Manzana.dll which had patches to work with iTunes 10. So I took this version to continue my project.
 I implemented the Dokan commands I needed to and nearly everything worked. I even changed the Dokan .NET binding to use a Manzana.iPhone as parameter instead of an object to simplify some procedures. (No more convertings needed.)
 But there were two big problems:
