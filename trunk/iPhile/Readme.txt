@@ -1,4 +1,4 @@
-Copyright (c) 2010 ebbes
+Copyright (c) 2010 ebbes <ebbes.ebbes@gmail.com>
 All rights reserved.
 
 This file is part of iPhile.
@@ -53,6 +53,23 @@ Software Licenses
 
 DokanNet Binding using Dokan, both available at http://dokan-dev.net/:
 
+ Copyright (C) 2010 ebbes <ebbes.ebbes@gmail.com>                            
+                                                                             
+ This program is free software; you can redistribute it and/or modify it     
+ under the terms of the GNU General Public License as published by the Free  
+ Software Foundation; either version 3 of the License, or (at your option)   
+ any later version.                                                          
+                                                                             
+ This program is distributed in the hope that it will be useful, but WITHOUT 
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       
+ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for    
+ more details.                                                               
+ You should have received a copy of the GNU General Public License along     
+ with this program; if not, see <http://www.gnu.org/licenses>.               
+
+ This file is based on work under the following copyright and permission
+ notice:
+
   Copyright (c) 2007 Hiroki Asakawa
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -74,6 +91,24 @@ DokanNet Binding using Dokan, both available at http://dokan-dev.net/:
   THE SOFTWARE.
   
 Manzana.dll taken out of iPhoneFS project available at http://code.google.com/p/iphonefs/
+
+ Copyright (C) 2010 ebbes <ebbes.ebbes@gmail.com>                            
+                                                                             
+ This program is free software; you can redistribute it and/or modify it     
+ under the terms of the GNU General Public License as published by the Free  
+ Software Foundation; either version 3 of the License, or (at your option)   
+ any later version.                                                          
+                                                                             
+ This program is distributed in the hope that it will be useful, but WITHOUT 
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       
+ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for    
+ more details.                                                               
+ You should have received a copy of the GNU General Public License along     
+ with this program; if not, see <http://www.gnu.org/licenses>.               
+
+ This file is based on work under the following copyright and permission
+ notice:
+
 
   Copyright (C) 2007-2011 Lokkju, Inc <lokkju@lokkju.com>                     
                                                                               

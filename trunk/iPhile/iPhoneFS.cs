@@ -1,6 +1,6 @@
 ﻿/*
- * Copyright (c) 2010 ebbes
- * All rights reserved.
+ * Copyright (c) 2010 ebbes <ebbes.ebbes@gmail.com>
+  * All rights reserved.
  * 
  * This file is part of iPhile.
  *

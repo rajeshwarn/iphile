@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2010 ebbes
+ * Copyright (c) 2010 ebbes <ebbes.ebbes@gmail.com>
  * All rights reserved.
  * 
  * This file is part of iPhile.
