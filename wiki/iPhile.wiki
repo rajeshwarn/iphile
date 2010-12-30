@@ -31,12 +31,11 @@ Let's talk about how you use it.
 Oh, of course you need to install [http://dokan-dev.net/en Dokan] version 0.5.3 or higher first to use iPhile.
 
 You just run iPhile.exe and it should work. In its current releases it logs events and errors into the file log.txt.
-When you run iPhile.exe, you see some kind of disclaimer. If you press any key, iPhile starts listening to iDevice's connect/disconnect events.
+When you run iPhile.exe, you see some kind of disclaimer. After displaying this message, iPhile will start listening to iDevice connect/disconnect events.
 If any device is found, it is mounted into Windows Explorer using a free drive letter.
 When a device gets disconnected, it is dismounted. (If iPhile should crash, a device might still be in Windows Explorer and it might block a drive letter. Use DriveUnmounter.exe to unmount it then.)
 If your device is jailbroken (afc2 service installed), two connections to it will be opened.
   * One to afc2 service. This is mapped into Windows Explorer.
   * One to afc service which is availabe even if the device is not jailbroken. This is not mapped into Windows Explorer, but instead, it will be used to determine the correct space values (free bytes, total bytes) of your iDevice instead of just showing the root partition's space.
 If your device is not jailbroken (or has the afc2 service not installed), only a connection to afc service will be set up giving you only access to the device's Media partition (and its space values).
-If you press any key, iPhile will stop listening to iDevice [dis]connects, unmount every mounted device and exit.
 Isn't that simple?
