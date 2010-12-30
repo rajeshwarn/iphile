@@ -190,8 +190,7 @@ namespace iPhile
         void ContextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             notifyMenu.Items.Clear();
-            ToolStripMenuItem mnuAbout = new ToolStripMenuItem("About", null, mnuAbout_Click, "mnuAbout");
-            mnuAbout.Image = iPhileResources.iPhileIcon.ToBitmap();
+            ToolStripMenuItem mnuAbout = new ToolStripMenuItem("About", iPhileResources.question.ToBitmap(), mnuAbout_Click, "mnuAbout");
             notifyMenu.Items.Add(mnuAbout);
 
             notifyMenu.Items.Add("-");
@@ -199,26 +198,36 @@ namespace iPhile
             {
                 foreach (iPhone iDevice in iDevices)
                 {
-                    ToolStripMenuItem mnuDevice = new ToolStripMenuItem(iDevice.DeviceName + " (" + iDevice.DriveLetter.ToString().ToUpper() + ":\\)");
-                    if (iDevice.DeviceType == "iPhone")
+                    //Main Entry
+                    ToolStripMenuItem mnuDevice = new ToolStripMenuItem(iDevice.DeviceNameFixed + " (" + iDevice.DriveLetter.ToString().ToUpper() + ":\\)");
+                    if (iDevice.DeviceTypeFixed == "iPhone")
                         mnuDevice.Image = iPhileResources.iphone.ToBitmap();
-                    else if (iDevice.DeviceType == "iPod")
+                    else if (iDevice.DeviceTypeFixed == "iPod")
                         mnuDevice.Image = iPhileResources.ipod.ToBitmap();
-                    else if (iDevice.DeviceType == "iPad")
-                        mnuDevice.Image = iPhileResources.ipad.ToBitmap();
-                    ToolStripMenuItem subItem = new ToolStripMenuItem(iDevice.DeviceName);
+                    else if (iDevice.DeviceTypeFixed == "iPad") //I hope this actually says "iPad" and nothing else
+                        mnuDevice.Image = iPhileResources.ipad.ToBitmap(); //I want an iPad :-(
+
+                    //Sub entries
+                    //DeviceName
+                    ToolStripMenuItem subItem = new ToolStripMenuItem(iDevice.DeviceNameFixed);
+                    subItem.Image = mnuDevice.Image;
                     subItem.Enabled = false;
                     mnuDevice.DropDownItems.Add(subItem);
-                    subItem = new ToolStripMenuItem(iDevice.DeviceVersion + (iDevice.IsJailbreak ? " jailbroken" : ""));
+                    //Version & jailbreak status
+                    subItem = new ToolStripMenuItem(iDevice.DeviceVersionFixed + (iDevice.IsJailbreak ? " jailbroken" : ""));
                     subItem.Enabled = false;
                     mnuDevice.DropDownItems.Add(subItem);
-                    subItem = new ToolStripMenuItem(iDevice.ActivationState);
+                    //ActivationState
+                    subItem = new ToolStripMenuItem(iDevice.ActivationStateFixed);
                     subItem.Enabled = false;
                     mnuDevice.DropDownItems.Add(subItem);
+                    //Separator
                     mnuDevice.DropDownItems.Add("-");
-                    subItem = new ToolStripMenuItem("Mounted to " + iDevice.DriveLetter.ToString().ToUpper() + ":\\ [open]", null, mnuOpen_Click, iDevice.DriveLetter.ToString().ToUpper());
+                    //Link to Explorer
+                    subItem = new ToolStripMenuItem("Mounted to " + iDevice.DriveLetter.ToString().ToUpper() + ":\\ [Explorer]", iPhileResources.e.ToBitmap(), mnuOpen_Click, iDevice.DriveLetter.ToString().ToUpper());
                     mnuDevice.DropDownItems.Add(subItem);
-                    subItem = new ToolStripMenuItem("Unmount device", null, mnuDismount_Click, iDevice.DeviceId);
+                    //Link to unmount
+                    subItem = new ToolStripMenuItem("Unmount device", iPhileResources.u.ToBitmap(), mnuDismount_Click, iDevice.DeviceIdFixed);
                     mnuDevice.DropDownItems.Add(subItem);
 
                     notifyMenu.Items.Add(mnuDevice);
@@ -230,7 +239,7 @@ namespace iPhile
             }
 
             notifyMenu.Items.Add("-");
-            ToolStripMenuItem mnuExit = new ToolStripMenuItem("Exit", null, mnuExit_Click, "mnuAbout");
+            ToolStripMenuItem mnuExit = new ToolStripMenuItem("Exit", iPhileResources.x.ToBitmap(), mnuExit_Click, "mnuAbout");
             notifyMenu.Items.Add(mnuExit);
             e.Cancel = false;
         }

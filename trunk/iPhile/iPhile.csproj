@@ -54,7 +54,7 @@
     <StartupObject>iPhile.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\iPhile.ico</ApplicationIcon>
+    <ApplicationIcon>iPhileIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -109,10 +109,15 @@
     <Content Include="COPYING.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="iPhileIcon.ico" />
     <Content Include="Readme.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\close.ico" />
+    <None Include="Resources\iPhileIcon.ico" />
+    <None Include="Resources\u.ico" />
+    <None Include="Resources\e.ico" />
+    <None Include="Resources\x.ico" />
+    <None Include="Resources\question.ico" />
     <None Include="Resources\ipod.ico" />
     <None Include="Resources\ipad.ico" />
     <None Include="Resources\iphone.ico" />

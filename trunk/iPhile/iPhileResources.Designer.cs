@@ -60,6 +60,13 @@ namespace iPhile {
             }
         }
         
+        internal static System.Drawing.Icon e {
+            get {
+                object obj = ResourceManager.GetObject("e", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
         internal static System.Drawing.Icon ipad {
             get {
                 object obj = ResourceManager.GetObject("ipad", resourceCulture);
@@ -84,6 +91,27 @@ namespace iPhile {
         internal static System.Drawing.Icon ipod {
             get {
                 object obj = ResourceManager.GetObject("ipod", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon question {
+            get {
+                object obj = ResourceManager.GetObject("question", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon u {
+            get {
+                object obj = ResourceManager.GetObject("u", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon x {
+            get {
+                object obj = ResourceManager.GetObject("x", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

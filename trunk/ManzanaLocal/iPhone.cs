@@ -110,6 +110,14 @@ namespace Manzana {
 		private bool		connected;
 		private string		current_directory;
         private bool wasAFC2 = false;
+
+        //BEGIN WORKAROUNDS
+        private string _DeviceName;
+        private string _DeviceVersion;
+        private string _DeviceId;
+        private string _ActivationState;
+        private string _DeviceType;
+        //END WORKAROUNDS
 		#endregion	// Locals
 
 		#region Constructors
@@ -119,6 +127,14 @@ namespace Manzana {
 		public unsafe iPhone (ConnectEventArgs iPhoneArgs) {
             iPhoneHandle = iPhoneArgs.Device;
             ConnectToPhone();
+
+            //BEGIN WORKAROUNDS
+            this._DeviceName = this.DeviceName;
+            this._DeviceVersion = this.DeviceVersion;
+            this._DeviceId = this.DeviceId;
+            this._ActivationState = this.ActivationState;
+            this._DeviceType = this.DeviceType;
+            //END WORKAROUNDS
 		}
 		#endregion	// Constructors
 
@@ -129,6 +145,52 @@ namespace Manzana {
         /// because it makes it easy for multiple threads to determine a phone's drive letter.
         /// </summary>
         public char DriveLetter { get; set; }
+
+        //BEGIN WORKAROUNDS - after a time, iPhone seems to be unable to get some values
+        //Until I find a better solution, we'll use this.
+        //But it seems to be useful as this information will still be valid (if not changed by others)
+        //when the device is disconnected.
+        //I don't plan changing my device's name.
+        //Version changing is not possible without reboot (= disconnect) (Firmware update)
+        //UDID doesn't change, either
+        //Have you ever seen an iPod touch transforming into an iPhone?
+        //Okay, ActivationState could change, but this is happening not that often :-)
+        public string DeviceNameFixed
+        {
+            get
+            {
+                return _DeviceName;
+            }
+        }
+        public string DeviceVersionFixed
+        {
+            get
+            {
+                return _DeviceVersion;
+            }
+        }
+        public string DeviceIdFixed
+        {
+            get
+            {
+                return _DeviceId;
+            }
+        }
+        public string DeviceTypeFixed
+        {
+            get
+            {
+                return _DeviceType;
+            }
+        }
+        public string ActivationStateFixed
+        {
+            get
+            {
+                return _ActivationState;
+            }
+        }
+        //END WORKAROUNDS
 
 		/// <summary>
 		/// Gets the current activation state of the phone
