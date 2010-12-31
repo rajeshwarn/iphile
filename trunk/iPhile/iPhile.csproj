@@ -110,9 +110,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="iPhileIcon.ico" />
-    <Content Include="Readme.txt">
+    <None Include="README.rtf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
     <None Include="Resources\M.ico" />
     <None Include="Resources\unactivated.ico" />
     <None Include="Resources\activated.ico" />

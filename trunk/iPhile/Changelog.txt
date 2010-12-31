@@ -1,3 +1,5 @@
 ﻿iPhile - CHANGELOG
 
 1.5 - Intitial public release.
+
+CHANGES see SVN and look at the changes yourself :P

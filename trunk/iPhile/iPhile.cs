@@ -195,7 +195,35 @@ namespace iPhile
             opt.Removable = true;
             opt.ThreadCount = 1;
 
-            DokanNet.DokanMain(opt, new iPhoneFS(Device));
+            int Return = DokanNet.DokanMain(opt, new iPhoneFS(Device));
+
+            if (Return < 0) //Dokan has had an error
+            {
+                string ErrorString;
+
+                switch (Return)
+                {
+                    case DokanNet.DOKAN_ERROR:
+                        ErrorString = "Dokan encountered a general error.";
+                        break;
+                    case DokanNet.DOKAN_DRIVE_LETTER_ERROR:
+                        ErrorString = "Bad drive letter specified.";
+                        break;
+                    case DokanNet.DOKAN_DRIVER_INSTALL_ERROR:
+                        ErrorString = "Dokan was unable to install its driver.";
+                        break;
+                    case DokanNet.DOKAN_START_ERROR:
+                        ErrorString = "Something seems to be wrong with your Dokan driver.";
+                        break;
+                    case DokanNet.DOKAN_MOUNT_ERROR:
+                        ErrorString = "Dokan was unable to assign the drive letter.";
+                        break;
+                    default:
+                        ErrorString = "Dokan encountered an unknown error.";
+                        break;
+                }
+                MessageBox.Show("An error occured:\r\n" + ErrorString, "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>
@@ -203,7 +231,7 @@ namespace iPhile
         /// </summary>
         private void Disconnect_FS(iPhone iDevice)
         {
-            Debugger.Log(string.Format("EVENT: Dismounting {1} under {0}:\\>", iDevice.DeviceNameFixed, iDevice.DriveLetter.ToString().ToUpper()), Debugger.LogLevel.Event);
+            Debugger.Log(string.Format("EVENT: Dismounting {0} under {1}:\\>", iDevice.DeviceNameFixed, iDevice.DriveLetter.ToString().ToUpper()), Debugger.LogLevel.Event);
             DokanNet.DokanUnmount(iDevice.DriveLetter);
         }
         #endregion
