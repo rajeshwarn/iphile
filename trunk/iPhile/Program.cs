@@ -74,7 +74,8 @@ namespace iPhile
                 }
                 else
                 {
-                    MessageBox.Show("iPhile is already running.", "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("iPhile is already running.\r\n"
+                        + "You can find iPhile's icon in your system tray, near the clock in your screen's lower right corner.", "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Environment.Exit(0);
                 }
             } //releases our Mutex
