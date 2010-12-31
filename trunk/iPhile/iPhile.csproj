@@ -113,6 +113,11 @@
     <Content Include="Readme.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\M.ico" />
+    <None Include="Resources\unactivated.ico" />
+    <None Include="Resources\activated.ico" />
+    <None Include="Resources\apple.ico" />
+    <None Include="Resources\pwnapple.ico" />
     <None Include="Resources\iPhileIcon.ico" />
     <None Include="Resources\u.ico" />
     <None Include="Resources\e.ico" />

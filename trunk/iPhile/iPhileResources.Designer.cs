@@ -60,6 +60,20 @@ namespace iPhile {
             }
         }
         
+        internal static System.Drawing.Icon activated {
+            get {
+                object obj = ResourceManager.GetObject("activated", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon apple {
+            get {
+                object obj = ResourceManager.GetObject("apple", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
         internal static System.Drawing.Icon e {
             get {
                 object obj = ResourceManager.GetObject("e", resourceCulture);
@@ -95,6 +109,20 @@ namespace iPhile {
             }
         }
         
+        internal static System.Drawing.Icon M {
+            get {
+                object obj = ResourceManager.GetObject("M", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon pwnapple {
+            get {
+                object obj = ResourceManager.GetObject("pwnapple", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
         internal static System.Drawing.Icon question {
             get {
                 object obj = ResourceManager.GetObject("question", resourceCulture);
@@ -105,6 +133,13 @@ namespace iPhile {
         internal static System.Drawing.Icon u {
             get {
                 object obj = ResourceManager.GetObject("u", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon unactivated {
+            get {
+                object obj = ResourceManager.GetObject("unactivated", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

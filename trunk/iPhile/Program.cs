@@ -31,6 +31,7 @@ namespace iPhile
         static void Main(string[] args)
         {
             bool SkipInfo = false;
+            bool AutoMount = true;
             foreach (string arg in args)
             {
                 if (arg.ToLower() == "-skipinfo")
@@ -50,6 +51,10 @@ namespace iPhile
                 {
                     Debugger.LogToFile = false;
                 }
+                if (arg.ToLower() == "-noautomount")
+                {
+                    AutoMount = false;
+                }
             }
 
             Application.EnableVisualStyles();
@@ -61,7 +66,7 @@ namespace iPhile
             {
                 if (isSingleInstance)
                 {
-                    iPhile iPhileInstance = new iPhile(SkipInfo);
+                    iPhile iPhileInstance = new iPhile(SkipInfo, AutoMount);
                     iPhileInstance.notifyIcon.Visible = true;
                     Application.Run();
                     iPhileInstance.notifyIcon.Dispose();
