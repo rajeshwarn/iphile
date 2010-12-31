@@ -44,6 +44,8 @@ namespace iPhile
         private ContextMenuStrip notifyMenu;
 
         private bool AutoMount;
+
+        private Dictionary<string, char> PreferredMountPoints = new Dictionary<string, char>();
         #endregion
 
         #region Constructor
@@ -73,6 +75,27 @@ namespace iPhile
             notifyIcon.Icon = iPhileResources.iPhileIcon;
             notifyIcon.ContextMenuStrip = notifyMenu;
             notifyIcon.ContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(ContextMenuStrip_Opening);
+
+            if (File.Exists("PreferredMountPoints.ini"))
+            {
+                try
+                {
+                    StreamReader sr = new StreamReader("PreferredMountPoints.ini");
+
+                    while (!sr.EndOfStream)
+                    {
+                        string Value = sr.ReadLine();
+                        PreferredMountPoints[Value.Split(':')[0].ToLower()] = Value.Split(':')[1].ToLower().ToCharArray(0, 1)[0];
+                    }
+
+                    sr.Close();
+                    sr.Dispose();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Error while opening PreferredMountPoints.ini", "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
 
             PhoneListener = new MultiPhone();
             PhoneListener.Connect += new ConnectEventHandler(Connect_iPhone);
@@ -193,10 +216,28 @@ namespace iPhile
             {
                 //iPhone connected
                 iPhone iDevice = new iPhone(args);
-
+                
+                char Letter;
                 if (AutoMount)
                 {
-                    iDevice.DriveLetter = DriveLetter();
+                    if (PreferredMountPoints.TryGetValue(iDevice.DeviceIdFixed, out Letter))
+                    {
+                        if (IsDriveLetterAvailable(Letter))
+                            iDevice.DriveLetter = Letter;
+                        else
+                        {
+                            MessageBox.Show("Preferred mount point not available. Using first free point instead.", "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            Letter = DriveLetter();
+                            iDevice.DriveLetter = Letter;
+                            PreferredMountPoints[iDevice.DeviceIdFixed] = Letter;
+                        }
+                    }
+                    else
+                    {
+                        Letter = DriveLetter();
+                        iDevice.DriveLetter = Letter;
+                        PreferredMountPoints[iDevice.DeviceIdFixed] = Letter;
+                    }
                     iDevices.Add(iDevice);
                     PhoneThreads.Add(new Thread(new ParameterizedThreadStart(Connect_FS)));
                     PhoneThreads[PhoneThreads.Count - 1].Start(iDevices[iDevices.Count - 1]);
@@ -356,6 +397,26 @@ namespace iPhile
                 Disconnect_FS(iDevice);
             }
             Debugger.Close();
+
+            try
+            {
+                if (File.Exists("PreferredMountPoints.ini"))
+                    File.Delete("PreferredMountPoints.ini");
+                StreamWriter sw = new StreamWriter("PreferredMountPoints.ini");
+
+                foreach (KeyValuePair<string, char> Pair in PreferredMountPoints)
+                {
+                    if (Pair.Value != '0')
+                        sw.WriteLine(Pair.Key + ":" + Pair.Value);
+                }
+                sw.Close();
+                sw.Dispose();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error while writing PreferredMountPoints.ini", "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
             Application.Exit();
         }
 
@@ -392,12 +453,31 @@ namespace iPhile
                 {                                  //Should also work on non-jailbroken iPhones.
                     if (Letter == '0')
                     {
-                        iDevices[i].DriveLetter = DriveLetter();
+                        if (PreferredMountPoints.TryGetValue(iDevices[i].DeviceIdFixed, out Letter))
+                        {
+                            if (IsDriveLetterAvailable(Letter))
+                                iDevices[i].DriveLetter = Letter;
+                            else
+                            {
+                                MessageBox.Show("Preferred mount point not available. Using first free point instead.", "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                Letter = DriveLetter();
+                                iDevices[i].DriveLetter = Letter;
+                                PreferredMountPoints[iDevices[i].DeviceIdFixed] = Letter;
+                            }
+                        }
+                        else
+                        {
+                            Letter = DriveLetter();
+                            iDevices[i].DriveLetter = Letter;
+                            PreferredMountPoints[iDevices[i].DeviceIdFixed] = Letter;
+                        }
                     }
                     else
                     {
                         iDevices[i].DriveLetter = Letter;
+                        PreferredMountPoints[iDevices[i].DeviceIdFixed] = Letter;
                     }
+
                     PhoneThreads[i] = new Thread(new ParameterizedThreadStart(Connect_FS));
                     PhoneThreads[i].Start(iDevices[i]);
                     break;
@@ -414,7 +494,15 @@ namespace iPhile
             string Path = Sender.Name + ":\\";
             System.Diagnostics.Process.Start("explorer.exe", Path);
         }
+
+        /// <summary>
+        /// Copy UDID to clipboard
+        /// </summary>
+        private void mnuUDID_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(((ToolStripMenuItem)sender).Name);
+            MessageBox.Show(string.Format("UDID {0} was copied to clipboard.", ((ToolStripMenuItem)sender).Name), "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
         #endregion
     }
-
 }

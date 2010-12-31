@@ -28,6 +28,7 @@ namespace iPhile
 {
     static class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
             bool SkipInfo = false;
