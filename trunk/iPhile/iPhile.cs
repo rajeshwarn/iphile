@@ -76,6 +76,8 @@ namespace iPhile
             notifyIcon.ContextMenuStrip = notifyMenu;
             notifyIcon.ContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(ContextMenuStrip_Opening);
 
+            notifyIcon.Text = "iPhile";
+
             if (File.Exists("PreferredMountPoints.ini"))
             {
                 try
