@@ -64,7 +64,7 @@ namespace iPhile
             bool isSingleInstance = false;
 
             using (Mutex mtx = new Mutex(true, "iPhileSingleInstanceMutex", out isSingleInstance))
-            {
+            { //This cool code is based on ideas from SharpDevelop's template. Thanks :-)
                 if (isSingleInstance)
                 {
                     iPhile iPhileInstance = new iPhile(SkipInfo, AutoMount);
