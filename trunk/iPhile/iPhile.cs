@@ -115,20 +115,25 @@ namespace iPhile
         /// <returns>char containing the lowest available drive letter or '0' (zero char) if no letter available</returns>
         private char DriveLetter()
         {
-            List<char> AvailableLetters = new List<char>();
+            // obsolete. Using new method instead to reduce doubled code
+            //List<char> AvailableLetters = new List<char>();
 
-            //don't use a and b cause they only work for floppy drives
-            for (int i = Convert.ToInt16('c'); i <= Convert.ToInt16('z'); i++)
-                AvailableLetters.Add((char)i);
+            ////don't use a and b cause they only work for floppy drives
+            //for (int i = Convert.ToInt16('c'); i <= Convert.ToInt16('z'); i++)
+            //    AvailableLetters.Add((char)i);
 
-            foreach (DriveInfo Drive in DriveInfo.GetDrives())
-                //AvailableLetters.Remove(Convert.ToChar(Drive.Name.Substring(0, 1).ToLower()));
-                AvailableLetters.Remove(Drive.Name.ToLower().ToCharArray()[0]); //Should be more clean.
+            //foreach (DriveInfo Drive in DriveInfo.GetDrives())
+            //    //AvailableLetters.Remove(Convert.ToChar(Drive.Name.Substring(0, 1).ToLower()));
+            //    AvailableLetters.Remove(Drive.Name.ToLower().ToCharArray()[0]); //Should be more clean.
 
-            if (AvailableLetters.Count == 0)
-                return '0';
-            else
-                return AvailableLetters[0];
+            //if (AvailableLetters.Count == 0)
+            //    return '0';
+            //else
+            //    return AvailableLetters[0];
+
+            List<char> AvailableLetters = AvailableDriveLetters();
+
+            return (AvailableLetters.Count == 0 ? '0' : AvailableLetters[0]);
         }
 
         /// <summary>
@@ -305,6 +310,8 @@ namespace iPhile
         void ContextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             notifyMenu.Items.Clear();
+
+            //About
             ToolStripMenuItem mnuItem = new ToolStripMenuItem("About", iPhileResources.question.ToBitmap(), mnuAbout_Click, "mnuAbout");
             notifyMenu.Items.Add(mnuItem);
 
@@ -312,97 +319,113 @@ namespace iPhile
             notifyMenu.Items.Add("-");
             if (iDevices.Count > 0)
             {
-                foreach (iPhone iDevice in iDevices)
-                {
-                    //Main Entry
-                    ToolStripMenuItem mnuDevice = new ToolStripMenuItem(iDevice.DeviceNameFixed + (iDevice.DriveLetter != '0' ?  " (" + iDevice.DriveLetter.ToString().ToUpper() + ":\\)" : ""));
-                    if (iDevice.DeviceTypeFixed == "iPhone")
-                        mnuDevice.Image = iPhileResources.iphone.ToBitmap();
-                    else if (iDevice.DeviceTypeFixed == "iPod")
-                        mnuDevice.Image = iPhileResources.ipod.ToBitmap();
-                    else if (iDevice.DeviceTypeFixed == "iPad") //I hope this actually says "iPad" and nothing else
-                        mnuDevice.Image = iPhileResources.ipad.ToBitmap(); //I want an iPad :-(
-
-                    //Sub entries
-                    //DeviceName
-                    ToolStripMenuItem subItem = new ToolStripMenuItem(iDevice.DeviceNameFixed);
-                    subItem.Image = mnuDevice.Image;
-                    subItem.Enabled = false;
-                    mnuDevice.DropDownItems.Add(subItem);
-
-                    //Version & jailbreak status
-                    if (iDevice.IsJailbreak)
-                    {
-                        subItem = new ToolStripMenuItem(iDevice.DeviceVersionFixed + " jailbroken");
-                        subItem.Image = iPhileResources.pwnapple.ToBitmap();
-                    }
-                    else
-                    {
-                        subItem = new ToolStripMenuItem(iDevice.DeviceVersionFixed);
-                        subItem.Image = iPhileResources.apple.ToBitmap();
-                    }
-                    subItem.Enabled = false;
-                    mnuDevice.DropDownItems.Add(subItem);
-
-                    //ActivationState
-                    subItem = new ToolStripMenuItem(iDevice.ActivationStateFixed);
-                    if (iDevice.ActivationStateFixed == "Activated" || iDevice.ActivationStateFixed == "WildcardActivated")
-                        subItem.Image = iPhileResources.activated.ToBitmap();
-                    else
-                        subItem.Image = iPhileResources.unactivated.ToBitmap();
-                    subItem.Enabled = false;
-                    mnuDevice.DropDownItems.Add(subItem);
-
-                    //Separator
-                    mnuDevice.DropDownItems.Add("-");
-
-                    if (iDevice.DriveLetter != '0')
-                    {
-                        //Link to Explorer
-                        subItem = new ToolStripMenuItem("Mounted to " + iDevice.DriveLetter.ToString().ToUpper() + ":\\ [Explorer]", iPhileResources.e.ToBitmap(), mnuOpen_Click, iDevice.DriveLetter.ToString().ToUpper());
-                        mnuDevice.DropDownItems.Add(subItem);
-                        //Link to unmount
-                        subItem = new ToolStripMenuItem("Unmount device", iPhileResources.u.ToBitmap(), mnuDismount_Click, iDevice.DeviceIdFixed);
-                        mnuDevice.DropDownItems.Add(subItem);
-                    }
-                    else
-                    {
-                        if (AvailableDriveLetters().Count > 0)
-                        {
-                            //Link to mount
-                            subItem = new ToolStripMenuItem("Mount device", iPhileResources.M.ToBitmap(), mnuMount_Click, "0;" + iDevice.DeviceIdFixed);
-                            mnuDevice.DropDownItems.Add(subItem);
-
-                            subItem = new ToolStripMenuItem("Mount device under...");
-                            subItem.Image = iPhileResources.M.ToBitmap();
-
-                            foreach (char DriveLetter in AvailableDriveLetters())
-                            {
-                                ToolStripMenuItem subsubItem = new ToolStripMenuItem(DriveLetter.ToString().ToUpper() + ":\\", null, mnuMount_Click, DriveLetter.ToString() + ";" + iDevice.DeviceIdFixed);
-                                subItem.DropDownItems.Add(subsubItem);
-                            }
-
-                            mnuDevice.DropDownItems.Add(subItem);
-                        }
-                        else
-                        {
-                            subItem = new ToolStripMenuItem("No drive letter available");
-                            mnuDevice.DropDownItems.Add(subItem);
-                        }
-                    }
-
-                    notifyMenu.Items.Add(mnuDevice);
-                }
+                //extracted to separate call to make this void here readable.
+                PopulateDeviceMenu();
             }
             else
             {
-                notifyMenu.Items.Add("No devices connected.");
+                mnuItem = new ToolStripMenuItem("No devices connected.");
+                mnuItem.Enabled = false;
+                notifyMenu.Items.Add(mnuItem);
             }
 
+            //Separator
             notifyMenu.Items.Add("-");
+
+            //Exit
             ToolStripMenuItem mnuExit = new ToolStripMenuItem("Exit", iPhileResources.x.ToBitmap(), mnuExit_Click, "mnuAbout");
             notifyMenu.Items.Add(mnuExit);
+
+            //Don't cancel showing the menu
             e.Cancel = false;
+        }
+
+        /// <summary>
+        /// populates the device context menu with connected devices
+        /// </summary>
+        private void PopulateDeviceMenu()
+        {
+            foreach (iPhone iDevice in iDevices)
+            {
+                //Main Entry
+                ToolStripMenuItem mnuDevice = new ToolStripMenuItem(iDevice.DeviceNameFixed + (iDevice.DriveLetter != '0' ? " (" + iDevice.DriveLetter.ToString().ToUpper() + ":\\)" : ""));
+                if (iDevice.DeviceTypeFixed == "iPhone")
+                    mnuDevice.Image = iPhileResources.iphone.ToBitmap();
+                else if (iDevice.DeviceTypeFixed == "iPod")
+                    mnuDevice.Image = iPhileResources.ipod.ToBitmap();
+                else if (iDevice.DeviceTypeFixed == "iPad") //I hope this actually says "iPad" and nothing else
+                    mnuDevice.Image = iPhileResources.ipad.ToBitmap(); //I want an iPad :-(
+
+                //Sub entries
+                //DeviceName
+                ToolStripMenuItem subItem = new ToolStripMenuItem(iDevice.DeviceNameFixed);
+                subItem.Image = mnuDevice.Image;
+                subItem.Enabled = false;
+                mnuDevice.DropDownItems.Add(subItem);
+
+                //Version & jailbreak status
+                if (iDevice.IsJailbreak)
+                {
+                    subItem = new ToolStripMenuItem(iDevice.DeviceVersionFixed + " jailbroken");
+                    subItem.Image = iPhileResources.pwnapple.ToBitmap();
+                }
+                else
+                {
+                    subItem = new ToolStripMenuItem(iDevice.DeviceVersionFixed);
+                    subItem.Image = iPhileResources.apple.ToBitmap();
+                }
+                subItem.Enabled = false;
+                mnuDevice.DropDownItems.Add(subItem);
+
+                //ActivationState
+                subItem = new ToolStripMenuItem(iDevice.ActivationStateFixed);
+                if (iDevice.ActivationStateFixed == "Activated" || iDevice.ActivationStateFixed == "WildcardActivated")
+                    subItem.Image = iPhileResources.activated.ToBitmap();
+                else
+                    subItem.Image = iPhileResources.unactivated.ToBitmap();
+                subItem.Enabled = false;
+                mnuDevice.DropDownItems.Add(subItem);
+
+                //Separator
+                mnuDevice.DropDownItems.Add("-");
+
+                if (iDevice.DriveLetter != '0')
+                {
+                    //Link to Explorer
+                    subItem = new ToolStripMenuItem("Mounted to " + iDevice.DriveLetter.ToString().ToUpper() + ":\\ [Explorer]", iPhileResources.e.ToBitmap(), mnuOpen_Click, iDevice.DriveLetter.ToString().ToUpper());
+                    mnuDevice.DropDownItems.Add(subItem);
+                    //Link to unmount
+                    subItem = new ToolStripMenuItem("Unmount device", iPhileResources.u.ToBitmap(), mnuDismount_Click, iDevice.DeviceIdFixed);
+                    mnuDevice.DropDownItems.Add(subItem);
+                }
+                else
+                {
+                    if (AvailableDriveLetters().Count > 0)
+                    {
+                        //Link to mount
+                        subItem = new ToolStripMenuItem("Mount device", iPhileResources.M.ToBitmap(), mnuMount_Click, "0;" + iDevice.DeviceIdFixed);
+                        mnuDevice.DropDownItems.Add(subItem);
+
+                        subItem = new ToolStripMenuItem("Mount device under...");
+                        subItem.Image = iPhileResources.M.ToBitmap();
+
+                        foreach (char DriveLetter in AvailableDriveLetters())
+                        {
+                            ToolStripMenuItem subsubItem = new ToolStripMenuItem(DriveLetter.ToString().ToUpper() + ":\\", null, mnuMount_Click, DriveLetter.ToString() + ";" + iDevice.DeviceIdFixed);
+                            subItem.DropDownItems.Add(subsubItem);
+                        }
+
+                        mnuDevice.DropDownItems.Add(subItem);
+                    }
+                    else
+                    {
+                        subItem = new ToolStripMenuItem("No drive letter available");
+                        mnuDevice.DropDownItems.Add(subItem);
+                    }
+                }
+
+                notifyMenu.Items.Add(mnuDevice);
+            }
         }
 
         /// <summary>
