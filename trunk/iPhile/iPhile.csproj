@@ -71,6 +71,8 @@
       <DependentUpon>iPhileResources.resx</DependentUpon>
     </Compile>
     <Compile Include="iPhile_DriveLetters.cs" />
+    <Compile Include="iPhile_Menu.cs" />
+    <Compile Include="iPhile_PreferredMountPoints.cs" />
     <Compile Include="iPhoneFS.cs" />
     <Compile Include="iPhile.cs" />
     <Compile Include="Program.cs" />
