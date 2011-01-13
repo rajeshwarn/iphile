@@ -39,6 +39,10 @@ namespace iPhile
         //Those file names are case insensitive, even if windows tried to create AuToRuN.iNf it would fail.
         private string[] FileCreationFilters = new string[] { "autorun.inf", "thumbs.db", "desktop.ini" };
 
+        //Proof-of-concept. Delegate using lambda expression.
+        private delegate string ConvertPathDelegate(string Path);
+        ConvertPathDelegate ConvertPath = (Path) => Path.Replace('\\', '/');
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -85,10 +89,10 @@ namespace iPhile
         public int CreateDirectory(string filename, DokanFileInfo info)
         {
             //If directory already exists throw error "already existing".
-            if (iDevice.Exists(filename.Replace('\\', '/')))
+            if (iDevice.Exists(ConvertPath(filename)))
                 return -DokanNet.ERROR_ALREADY_EXISTS;
             Debugger.Log(LetterString + "FS: CreateDirectory: " + filename, Debugger.LogLevel.Information);
-            return (iDevice.CreateDirectory(filename.Replace('\\', '/')) ? DokanNet.DOKAN_SUCCESS : -DokanNet.DOKAN_ERROR);
+            return (iDevice.CreateDirectory(ConvertPath(filename)) ? DokanNet.DOKAN_SUCCESS : -DokanNet.DOKAN_ERROR);
         }
 
         /// <summary>
@@ -111,7 +115,7 @@ namespace iPhile
 
             try //and pray it works...
             {
-                if (iDevice.IsDirectory(filename.Replace('\\', '/')))
+                if (iDevice.IsDirectory(ConvertPath(filename)))
                 {
                     info.IsDirectory = true;
                     info.Context = null;
@@ -120,30 +124,30 @@ namespace iPhile
                 switch (mode)
                 {
                     case System.IO.FileMode.CreateNew: //Creates a new file if not already existing, else drop error
-                        if (iDevice.Exists(filename.Replace('\\', '/')))
+                        if (iDevice.Exists(ConvertPath(filename)))
                             return -DokanNet.ERROR_ALREADY_EXISTS;
-                        info.Context = iPhoneFile.OpenWrite(iDevice, filename.Replace('\\', '/'));
+                        info.Context = iPhoneFile.OpenWrite(iDevice, ConvertPath(filename));
                         break;
                     case System.IO.FileMode.Create: //Create a new file even if already existing
-                        info.Context = iPhoneFile.OpenWrite(iDevice, filename.Replace('\\', '/'));
+                        info.Context = iPhoneFile.OpenWrite(iDevice, ConvertPath(filename));
                         break;
                     case System.IO.FileMode.Open: //If file not existing drop error
-                        if (!iDevice.Exists(filename.Replace('\\', '/')))
+                        if (!iDevice.Exists(ConvertPath(filename)))
                             return -DokanNet.ERROR_FILE_NOT_FOUND;
-                        info.Context = iPhoneFile.OpenRead(iDevice, filename.Replace('\\', '/'));
+                        info.Context = iPhoneFile.OpenRead(iDevice, ConvertPath(filename));
                         break;
                     case System.IO.FileMode.Append: //Appends to file or creates a new file if not existing
-                        if (!iDevice.Exists(filename.Replace('\\', '/')))
-                            info.Context = iPhoneFile.OpenWrite(iDevice, filename.Replace('\\', '/'));
+                        if (!iDevice.Exists(ConvertPath(filename)))
+                            info.Context = iPhoneFile.OpenWrite(iDevice, ConvertPath(filename));
                         break;
                     case System.IO.FileMode.OpenOrCreate: //Open file if exists; Create a file if not existing
-                        if (!iDevice.Exists(filename.Replace('\\', '/')))
-                            info.Context = iPhoneFile.OpenWrite(iDevice, filename.Replace('\\', '/'));
+                        if (!iDevice.Exists(ConvertPath(filename)))
+                            info.Context = iPhoneFile.OpenWrite(iDevice, ConvertPath(filename));
                         else
-                            info.Context = iPhoneFile.OpenRead(iDevice, filename.Replace('\\', '/'));
+                            info.Context = iPhoneFile.OpenRead(iDevice, ConvertPath(filename));
                         break;
                     case System.IO.FileMode.Truncate: //Open file and delete its contents
-                        info.Context = iPhoneFile.OpenWrite(iDevice, filename.Replace('\\', '/'));
+                        info.Context = iPhoneFile.OpenWrite(iDevice, ConvertPath(filename));
                         break;
                 }
             }
@@ -161,7 +165,7 @@ namespace iPhile
         public int DeleteDirectory(string filename, DokanFileInfo info)
         {
             Debugger.Log(LetterString + "FS: DeleteDirectory: " + filename, Debugger.LogLevel.Information);
-            iDevice.DeleteDirectory(filename.Replace('\\', '/'));
+            iDevice.DeleteDirectory(ConvertPath(filename));
             return DokanNet.DOKAN_SUCCESS;
         }
 
@@ -171,7 +175,7 @@ namespace iPhile
         public int DeleteFile(string filename, DokanFileInfo info)
         {
             Debugger.Log(LetterString + "FS: DeleteFile: " + filename, Debugger.LogLevel.Information);
-            iDevice.DeleteFile(filename.Replace('\\', '/'));
+            iDevice.DeleteFile(ConvertPath(filename));
             return DokanNet.DOKAN_SUCCESS;
         }
 
@@ -203,7 +207,7 @@ namespace iPhile
             DokanFileInfo info)
         {
             Debugger.Log(LetterString + "FS: FindFiles: " + filename, Debugger.LogLevel.Information);
-            string Filename = filename.Replace('\\', '/');
+            string Filename = ConvertPath(filename);
 
             if (!iDevice.Exists(Filename))
                 return -DokanNet.ERROR_PATH_NOT_FOUND;
@@ -294,7 +298,7 @@ namespace iPhile
             try
             {
                 Debugger.Log(LetterString + "FS: GetFileInformation: " + filename, Debugger.LogLevel.Information);
-                string Filename = filename.Replace('\\', '/');
+                string Filename = ConvertPath(filename);
 
                 if (!iDevice.Exists(Filename))
                     return -DokanNet.ERROR_FILE_NOT_FOUND;
@@ -368,7 +372,7 @@ namespace iPhile
             try
             {
                 //Manzana.dll 'rename' is actually a move command
-                iDevice.Rename(filename.Replace('\\', '/'), newname.Replace('\\', '/'));
+                iDevice.Rename(ConvertPath(filename), ConvertPath(newname));
             }
             catch (Exception ex)
             {
@@ -387,7 +391,7 @@ namespace iPhile
         public int OpenDirectory(string filename, DokanFileInfo info)
         {
             Debugger.Log(LetterString + "FS: OpenDirectory: " + filename, Debugger.LogLevel.Information);
-            info.IsDirectory = (iDevice.IsDirectory(filename.Replace('\\', '/')) || filename.Replace('\\', '/') == "/");
+            info.IsDirectory = (iDevice.IsDirectory(ConvertPath(filename)) || ConvertPath(filename) == "/");
             return DokanNet.DOKAN_SUCCESS;
         }
 
@@ -405,16 +409,16 @@ namespace iPhile
             Debugger.Log(LetterString + "INFO: FS: ReadFile: " + filename + " Offset " + offset.ToString() + " ReadBytes " + buffer.Length.ToString(), Debugger.LogLevel.Information);
 
             //Stop if file does not exist
-            if (!iDevice.Exists(filename.Replace('\\', '/')))
+            if (!iDevice.Exists(ConvertPath(filename)))
                 return -DokanNet.ERROR_FILE_NOT_FOUND;
 
-            if (!iDevice.IsFile(filename.Replace('\\', '/')))
+            if (!iDevice.IsFile(ConvertPath(filename)))
                 return -DokanNet.ERROR_FILE_NOT_FOUND;
 
             try
             {
                 if (info.Context == null)
-                    info.Context = iPhoneFile.Open(iDevice, filename.Replace('\\', '/'), System.IO.FileAccess.Read);
+                    info.Context = iPhoneFile.Open(iDevice, ConvertPath(filename), System.IO.FileAccess.Read);
 
                 info.Context.Position = offset; //Simply set the correct offset
                 readBytes = (uint)info.Context.Read(buffer, 0, buffer.Length); //And read it into our buffer
@@ -536,7 +540,7 @@ namespace iPhile
             try
             {
                 if (info.Context == null) //should not happen. But who knows.
-                    info.Context = iPhoneFile.OpenWrite(iDevice, filename.Replace('\\', '/'));
+                    info.Context = iPhoneFile.OpenWrite(iDevice, ConvertPath(filename));
                 long InitialOffset = offset; //Set initial offset
                 info.Context.Position = offset; //Set offset, this is working now :-)
                 info.Context.Write(buffer, 0, buffer.Length);

@@ -29,23 +29,23 @@ using Manzana;
 
 namespace iPhile
 {
-    public sealed class iPhile
+    public sealed partial class iPhile
     {
         #region Types
         //Listens to iDevice connect/disconnect events
         private MultiPhone PhoneListener;
-
-        //Contains every mounted iDevice
-        private List<iPhone> iDevices = new List<iPhone>();
-        //Contains the threads which are used to mount the iDevices
-        private List<Thread> PhoneThreads = new List<Thread>();
 
         public NotifyIcon notifyIcon;
         private ContextMenuStrip notifyMenu;
 
         private bool AutoMount;
 
+        //Preferred mount points for iDevices. UDID => char
         private Dictionary<string, char> PreferredMountPoints = new Dictionary<string, char>();
+        //Every connected iDevice. UDID => iPhone
+        private Dictionary<string, iPhone> iDevices = new Dictionary<string, iPhone>();
+        //Threads used to mount iDevices. UDID => Thread
+        private Dictionary<string, Thread> PhoneThreads = new Dictionary<string, Thread>();
         #endregion
 
         #region Constructor
@@ -106,72 +106,7 @@ namespace iPhile
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Get the lowest available Drive Letter
-        /// Function assumes all drive letters from C to Z are free.
-        /// (A and B are ignored because Windows won't let us map iPhone Filesystem to them.)
-        /// Then every occupied letter is removed from the list and the lowest will be given back.
-        /// </summary>
-        /// <returns>char containing the lowest available drive letter or '0' (zero char) if no letter available</returns>
-        private char DriveLetter()
-        {
-            // obsolete. Using new method instead to reduce doubled code
-            //List<char> AvailableLetters = new List<char>();
 
-            ////don't use a and b cause they only work for floppy drives
-            //for (int i = Convert.ToInt16('c'); i <= Convert.ToInt16('z'); i++)
-            //    AvailableLetters.Add((char)i);
-
-            //foreach (DriveInfo Drive in DriveInfo.GetDrives())
-            //    //AvailableLetters.Remove(Convert.ToChar(Drive.Name.Substring(0, 1).ToLower()));
-            //    AvailableLetters.Remove(Drive.Name.ToLower().ToCharArray()[0]); //Should be more clean.
-
-            //if (AvailableLetters.Count == 0)
-            //    return '0';
-            //else
-            //    return AvailableLetters[0];
-
-            List<char> AvailableLetters = AvailableDriveLetters();
-
-            return (AvailableLetters.Count == 0 ? '0' : AvailableLetters[0]);
-        }
-
-        /// <summary>
-        /// Returns a list of every available drive letter
-        /// </summary>
-        private List<char> AvailableDriveLetters()
-        {
-            List<char> AvailableLetters = new List<char>();
-
-            //don't use a and b cause they only work for floppy drives
-            for (int i = Convert.ToInt16('c'); i <= Convert.ToInt16('z'); i++)
-                AvailableLetters.Add((char)i);
-
-            foreach (DriveInfo Drive in DriveInfo.GetDrives())
-                //AvailableLetters.Remove(Convert.ToChar(Drive.Name.Substring(0, 1).ToLower()));
-                AvailableLetters.Remove(Drive.Name.ToLower().ToCharArray()[0]); //Should be more clean.
-
-            return AvailableLetters;
-        }
-
-        /// <summary>
-        /// Checks whether the specified drive letter is available
-        /// </summary>
-        private bool IsDriveLetterAvailable(char DriveLetter)
-        {
-            bool Available = true;
-
-            foreach (DriveInfo Drive in DriveInfo.GetDrives())
-            {
-                if (Drive.Name.ToLower().ToCharArray()[0] == DriveLetter)
-                {
-                    Available = false;
-                    break;
-                }
-            }
-
-            return Available;
-        }
 
         /// <summary>
         /// iPhone connected, so connect filesystem
@@ -273,31 +208,28 @@ namespace iPhile
                         iDevice.DriveLetter = Letter;
                         PreferredMountPoints[iDevice.DeviceIdFixed] = Letter;
                     }
-                    iDevices.Add(iDevice);
-                    PhoneThreads.Add(new Thread(new ParameterizedThreadStart(Connect_FS)));
-                    PhoneThreads[PhoneThreads.Count - 1].Start(iDevices[iDevices.Count - 1]);
+                    iDevices[iDevice.DeviceIdFixed] = iDevice;
+                    PhoneThreads[iDevice.DeviceIdFixed] = new Thread(new ParameterizedThreadStart(Connect_FS));
+                    PhoneThreads[iDevice.DeviceIdFixed].Start(iDevices[iDevice.DeviceIdFixed]);
                 }
                 else
                 {
                     iDevice.DriveLetter = '0';
-                    iDevices.Add(iDevice);
-                    PhoneThreads.Add(null);
+                    iDevices[iDevice.DeviceIdFixed] = iDevice;
+                    PhoneThreads[iDevice.DeviceIdFixed] = null;
                 }
             }
             else
             {
-                //Cycle through mounted iDevices...
-                for (int i = 0; i < iDevices.Count; i++)
+                foreach (iPhone iDevice in iDevices.Values)
                 {
-                    if (!iDevices[i].IsDirectory("/")) //Only way I found so far to check if iPhone is still connected.
-                    {                                  //Should also work on non-jailbroken iPhones.
-                        if (PhoneThreads[i] != null)
-                        {
-                            PhoneThreads[i].Abort();
-                        }
-                        PhoneThreads.RemoveAt(i);
-                        Disconnect_FS(iDevices[i]);
-                        iDevices.RemoveAt(i);
+                    if (!iDevice.IsDirectory("/")) //Only way I found so far to check if iPhone is still connected.
+                    {                              //Should also work on non-jailbroken iPhones.
+                        if (PhoneThreads[iDevice.DeviceIdFixed] != null)
+                            PhoneThreads[iDevice.DeviceIdFixed].Abort();
+                        PhoneThreads.Remove(iDevice.DeviceIdFixed);
+                        Disconnect_FS(iDevice);
+                        iDevices.Remove(iDevice.DeviceIdFixed);
                         break;
                     }
                 }
@@ -345,7 +277,7 @@ namespace iPhile
         /// </summary>
         private void PopulateDeviceMenu()
         {
-            foreach (iPhone iDevice in iDevices)
+            foreach (iPhone iDevice in iDevices.Values)
             {
                 //Main Entry
                 ToolStripMenuItem mnuDevice = new ToolStripMenuItem(iDevice.DeviceNameFixed + (iDevice.DriveLetter != '0' ? " (" + iDevice.DriveLetter.ToString().ToUpper() + ":\\)" : ""));
@@ -445,7 +377,7 @@ namespace iPhile
         private void mnuExit_Click(object sender, EventArgs e)
         {
             //Dismount every iDevice
-            foreach (iPhone iDevice in iDevices)
+            foreach (iPhone iDevice in iDevices.Values)
             {
                 Disconnect_FS(iDevice);
             }
@@ -481,17 +413,10 @@ namespace iPhile
             ToolStripMenuItem Sender = (ToolStripMenuItem)sender;
             string UDID = Sender.Name;
 
-            for (int i = 0; i < iDevices.Count; i++)
-            {
-                if (iDevices[i].DeviceIdFixed == UDID)
-                {
-                    PhoneThreads[i].Abort();
-                    PhoneThreads[i] = null;
-                    Disconnect_FS(iDevices[i]);
-                    iDevices[i].DriveLetter = '0';
-                    break;
-                }
-            }
+            PhoneThreads[UDID].Abort();
+            PhoneThreads[UDID] = null;
+            Disconnect_FS(iDevices[UDID]);
+            iDevices[UDID].DriveLetter = '0';
         }
 
         private void mnuMount_Click(object sender, EventArgs e)
@@ -500,42 +425,35 @@ namespace iPhile
             char Letter = Sender.Name.Split(';')[0].ToLower().ToCharArray(0, 1)[0];
             string UDID = Sender.Name.Split(';')[1];
 
-            for (int i = 0; i < iDevices.Count; i++)
+            if (Letter == '0')
             {
-                if (iDevices[i].DeviceId == UDID) //Only way I found so far to check if iPhone is still connected.
-                {                                  //Should also work on non-jailbroken iPhones.
-                    if (Letter == '0')
-                    {
-                        if (PreferredMountPoints.TryGetValue(iDevices[i].DeviceIdFixed, out Letter))
-                        {
-                            if (IsDriveLetterAvailable(Letter))
-                                iDevices[i].DriveLetter = Letter;
-                            else
-                            {
-                                MessageBox.Show("Preferred mount point not available. Using first free point instead.", "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                                Letter = DriveLetter();
-                                iDevices[i].DriveLetter = Letter;
-                                PreferredMountPoints[iDevices[i].DeviceIdFixed] = Letter;
-                            }
-                        }
-                        else
-                        {
-                            Letter = DriveLetter();
-                            iDevices[i].DriveLetter = Letter;
-                            PreferredMountPoints[iDevices[i].DeviceIdFixed] = Letter;
-                        }
-                    }
+                if (PreferredMountPoints.TryGetValue(iDevices[UDID].DeviceIdFixed, out Letter))
+                {
+                    if (IsDriveLetterAvailable(Letter))
+                        iDevices[UDID].DriveLetter = Letter;
                     else
                     {
-                        iDevices[i].DriveLetter = Letter;
-                        PreferredMountPoints[iDevices[i].DeviceIdFixed] = Letter;
+                        MessageBox.Show("Preferred mount point not available. Using first free point instead.", "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        Letter = DriveLetter();
+                        iDevices[UDID].DriveLetter = Letter;
+                        PreferredMountPoints[iDevices[UDID].DeviceIdFixed] = Letter;
                     }
-
-                    PhoneThreads[i] = new Thread(new ParameterizedThreadStart(Connect_FS));
-                    PhoneThreads[i].Start(iDevices[i]);
-                    break;
+                }
+                else
+                {
+                    Letter = DriveLetter();
+                    iDevices[UDID].DriveLetter = Letter;
+                    PreferredMountPoints[iDevices[UDID].DeviceIdFixed] = Letter;
                 }
             }
+            else
+            {
+                iDevices[UDID].DriveLetter = Letter;
+                PreferredMountPoints[iDevices[UDID].DeviceIdFixed] = Letter;
+            }
+
+            PhoneThreads[UDID] = new Thread(new ParameterizedThreadStart(Connect_FS));
+            PhoneThreads[UDID].Start(iDevices[UDID]);
         }
 
         /// <summary>
