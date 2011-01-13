@@ -5,13 +5,13 @@ using System.IO;
 
 namespace iPhile
 {
+    /// <summary>
+    /// This partial class contains code to get available drive letters.
+    /// </summary>
     public sealed partial class iPhile
     {
         /// <summary>
         /// Get the lowest available Drive Letter
-        /// Function assumes all drive letters from C to Z are free.
-        /// (A and B are ignored because Windows won't let us map iPhone Filesystem to them.)
-        /// Then every occupied letter is removed from the list and the lowest will be given back.
         /// </summary>
         /// <returns>char containing the lowest available drive letter or '0' (zero char) if no letter available</returns>
         private char DriveLetter()
@@ -23,6 +23,9 @@ namespace iPhile
 
         /// <summary>
         /// Returns a list of every available drive letter
+        /// Function assumes all drive letters from C to Z are free.
+        /// (A and B are ignored because they are reserved for floppy drives and thus not available for mapping.)
+        /// Then every occupied letter is removed from the list and the lowest will be given back.
         /// </summary>
         private List<char> AvailableDriveLetters()
         {

@@ -7,9 +7,11 @@ using System.Threading;
 
 namespace iPhile
 {
+    /// <summary>
+    /// This partial class contains iPhile's context menu logic.
+    /// </summary>
     public sealed partial class iPhile
     {
-
         /// <summary>
         /// Populates context menu
         /// </summary>
@@ -221,15 +223,6 @@ namespace iPhile
             ToolStripMenuItem Sender = (ToolStripMenuItem)sender;
             string Path = Sender.Name + ":\\";
             System.Diagnostics.Process.Start("explorer.exe", Path);
-        }
-
-        /// <summary>
-        /// Copy UDID to clipboard
-        /// </summary>
-        private void mnuUDID_Click(object sender, EventArgs e)
-        {
-            Clipboard.SetText(((ToolStripMenuItem)sender).Name);
-            MessageBox.Show(string.Format("UDID {0} was copied to clipboard.", ((ToolStripMenuItem)sender).Name), "iPhile", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

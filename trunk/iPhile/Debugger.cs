@@ -27,7 +27,6 @@ namespace iPhile
 {
     /// <summary>
     /// Small debugger/logger class.
-    /// Logs to debug window if compiled as DEBUG, else logs to log.txt
     /// </summary>
     static class Debugger
     {
