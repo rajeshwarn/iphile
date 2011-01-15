@@ -92,7 +92,7 @@ namespace iPhile
             if (iDevice.Exists(ConvertPath(filename)))
                 return -DokanNet.ERROR_ALREADY_EXISTS;
             Debugger.Log(LetterString + "FS: CreateDirectory: " + filename, Debugger.LogLevel.Information);
-            return (iDevice.CreateDirectory(ConvertPath(filename)) ? DokanNet.DOKAN_SUCCESS : -DokanNet.DOKAN_ERROR);
+            return (iDevice.CreateDirectory(ConvertPath(filename)) ? DokanNet.DOKAN_SUCCESS : DokanNet.DOKAN_ERROR);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace iPhile
             catch (Exception ex)
             {
                 Debugger.Log(LetterString + "ERROR: FS: CreateFile: " + ex.Message + " Filename: " + filename, Debugger.LogLevel.Error);
-                return -DokanNet.DOKAN_ERROR;
+                return DokanNet.DOKAN_ERROR;
             }
             return DokanNet.DOKAN_SUCCESS;
         }
@@ -343,7 +343,7 @@ namespace iPhile
             catch (Exception ex)
             {
                 Debugger.Log(LetterString + "ERROR: FS: GetFileInformation: " + ex.Message + " Filename: " + filename, Debugger.LogLevel.Error);
-                return -DokanNet.DOKAN_ERROR;
+                return DokanNet.DOKAN_ERROR;
             }
         }
 
@@ -379,7 +379,7 @@ namespace iPhile
                 
                 Debugger.Log(LetterString + "ERROR: FS: MoveFile: " + ex.Message + " " + filename + " -> " + newname, Debugger.LogLevel.Error);
                 
-                return -DokanNet.DOKAN_ERROR;
+                return DokanNet.DOKAN_ERROR;
             }
             return DokanNet.DOKAN_SUCCESS;
         }
@@ -426,7 +426,7 @@ namespace iPhile
             catch (Exception ex)
             {
                 Debugger.Log(LetterString + "ERROR: FS: ReadFile: " + ex.Message + " Filename: " + filename, Debugger.LogLevel.Error);
-                return -DokanNet.DOKAN_ERROR;
+                return DokanNet.DOKAN_ERROR; //DOKAN_ERROR = -1 (already negative)
             }
             return DokanNet.DOKAN_SUCCESS;
         }
@@ -549,7 +549,7 @@ namespace iPhile
             catch (Exception ex)
             {
                 Debugger.Log(LetterString + "ERROR: FS: WriteFile: " + ex.Message + " Filename: " + filename, Debugger.LogLevel.Error);
-                return -DokanNet.DOKAN_ERROR;
+                return DokanNet.DOKAN_ERROR;
             }
             return DokanNet.DOKAN_SUCCESS;
         }
